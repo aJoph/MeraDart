@@ -11,6 +11,8 @@ class Meaning with _$Meaning {
   factory Meaning({
     required String partOfSpeech,
     required List<Definition> definitions,
+    required List<String> synonyms,
+    required List<String> antonyms,
   }) = _Meaning;
 
   factory Meaning.fromJson(Map<String, Object?> json) =>
