@@ -1,10 +1,12 @@
 import 'package:mera_mera_bot/mera_mera_bot.dart';
 import 'package:teledart/model.dart';
 import 'package:teledart/telegram.dart';
-import 'package:youtube_explode_dart/youtube_explode_dart.dart';
+import 'package:youtube_explode_dart/youtube_explode_dart.dart' as yt;
 
-final yt = YoutubeExplode().search;
-const maxYtResults = 5;
+final _yt = yt.YoutubeExplode().search;
+const maxYtResults = 20;
+
+final cachedQueries = <String, List<yt.Video>>{};
 
 Future<void> handleYt(TeleDartMessage? message) async {
   if (message == null) return;
@@ -15,9 +17,18 @@ Future<void> handleYt(TeleDartMessage? message) async {
     return;
   }
 
-  final video = (await yt.search(query)).first;
+  yt.Video? video;
+  if (!cachedQueries.containsKey(query)) {
+    await getVidTemporarily(query);
+  }
+  video = cachedQueries[query]?.first;
 
-  final replyString = """(1/maxYtResults)
+  if (video == null) {
+    message.reply("Não achei nada.");
+    return;
+  }
+
+  final replyString = """(01/$maxYtResults)
 Da pesquisa:
 <i>$query</i>
 Eu achei:
@@ -30,13 +41,19 @@ por
       parse_mode: 'HTML', reply_markup: getYtInlineKeyboard(video.url));
 }
 
+Future<void> getVidTemporarily(String query) async {
+  cachedQueries[query] = await _yt.search(query);
+  Future.delayed(const Duration(minutes: 5))
+      .whenComplete(() => cachedQueries.remove(query));
+}
+
 Future<void> handleYtCallback(TeleDartCallbackQuery? m) async {
   if (m == null) return;
 
   final lines = m.message?.text?.split("\n");
   if (lines == null) return;
 
-  var nums = int.parse(lines[0][1]);
+  var nums = int.tryParse(lines[0].substring(1, 3)) ?? -1;
   if (nums == -1) return;
 
   if (m.data == "next") {
@@ -55,8 +72,13 @@ Future<void> handleYtCallback(TeleDartCallbackQuery? m) async {
     return;
   }
 
-  final video = (await yt.search(lines[2]))[nums];
-  final replyString = """($nums/$maxYtResults)
+  if (!cachedQueries.containsKey(lines[2])) {
+    await getVidTemporarily(lines[2]);
+  }
+  final video = cachedQueries[lines[2]]?[nums];
+  if (video == null) return;
+
+  final replyString = """(${nums.toFormattedString()}/$maxYtResults)
 Da pesquisa:
 <i>${lines[2]}</i>
 Eu achei:
@@ -82,4 +104,14 @@ InlineKeyboardMarkup getYtInlineKeyboard(String videoUrl) {
       InlineKeyboardButton(text: ">", callback_data: "next"),
     ]
   ]);
+}
+
+extension IntFormat on int {
+  String toFormattedString() {
+    if (this < 10) {
+      return "0$this";
+    } else {
+      return toString();
+    }
+  }
 }

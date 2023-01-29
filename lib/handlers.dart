@@ -1,25 +1,35 @@
 import 'package:mera_mera_bot/handlers/define_handler.dart';
 import 'package:mera_mera_bot/handlers/img_handler.dart';
 import 'package:mera_mera_bot/handlers/magic_8b_handler.dart';
+import 'package:mera_mera_bot/handlers/spell_handler.dart';
 import 'package:mera_mera_bot/handlers/start_handler.dart';
 import 'package:mera_mera_bot/handlers/yt_handler.dart';
 import 'package:teledart/model.dart';
+import 'package:teledart/teledart.dart';
 
 import 'handlers/book_handler.dart';
 import 'handlers/inspire_handler.dart';
 
-void start(TeleDartMessage? m) => handleStart(m);
+class Handler {
+  const Handler({required this.bot});
 
-void yt(TeleDartMessage? m) => handleYt(m);
+  final TeleDart bot;
 
-void ytCallback(TeleDartCallbackQuery? m) => handleYtCallback(m);
+  void start(TeleDartMessage? m) => handleStart(m);
 
-void img(TeleDartMessage? m) => handleImg(m);
+  void yt(TeleDartMessage? m) => handleYt(m);
 
-void define(TeleDartMessage? m) => handleDefine(m);
+  void ytCallback(TeleDartCallbackQuery? m) => handleYtCallback(m);
 
-void magic8b(TeleDartMessage? m) => handle8b(m);
+  void img(TeleDartMessage? m) => handleImg(m);
 
-void book(TeleDartMessage? m) => handleBook(m);
+  void define(TeleDartMessage? m) => handleDefine(m);
 
-void inspire(TeleDartMessage? m) => handleInspire(m);
+  void magic8b(TeleDartMessage? m) => handle8b(m);
+
+  void book(TeleDartMessage? m) => handleBook(m);
+
+  void inspire(TeleDartMessage? m) => handleInspire(m);
+
+  void spell(TeleDartMessage? m) => handleSpell(m, bot);
+}
