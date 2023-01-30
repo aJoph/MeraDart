@@ -7,8 +7,6 @@ import 'package:teledart/teledart.dart';
 
 late final TeleDart mera;
 
-var timeoutWhen = createExitTimer();
-
 Future<void> main(List<String> arguments) async {
   print("Initializing.");
   mera = await mera_bot.getBot();
@@ -26,23 +24,9 @@ Future<void> main(List<String> arguments) async {
   print("Starting bot ${(await mera.getMe()).username}");
   mera.start();
 
-  final socket = await ServerSocket.bind("0.0.0.0", 8443);
-  final server = HttpServer.listenOn(socket);
-  server.listen((event) {
-    timeoutWhen.cancel();
-    timeoutWhen = createExitTimer();
-  });
-
   ProcessSignal.sigint.watch().listen((event) {
     print("Caught termination signal. Exiting.");
-    server.close(force: true);
-    socket.close();
     mera.close();
     exit(0);
   });
 }
-
-Timer createExitTimer() => Timer(const Duration(minutes: 30), () {
-      print("No activity since 30 minutes. Terminating.");
-      exit(0);
-    });
