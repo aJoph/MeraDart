@@ -9,3 +9,5 @@ build/
 
 **/*.freezed.dart
 **/*.g.dart
+
+fly.toml
