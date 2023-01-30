@@ -3,5 +3,4 @@ services:
     name: mera-dart
     env: docker
     plan: free
-    buildCommand: docker build --build-arg BOT_TOKEN=$BOT_TOKEN -t mera-bot .
-    startCommand: docker run mera-bot
+    buildCommand: docker build --build-arg BOT_TOKEN=$BOT_TOKEN .
