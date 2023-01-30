@@ -45,7 +45,8 @@ void handle8b(TeleDartMessage? message) {
   if (message == null) return;
 
   var whatUserSaid = getArguments(message.text ?? "");
-  if (whatUserSaid.isEmpty && message.reply_to_message != null) {
+  if (whatUserSaid.isNotEmpty) {
+  } else if (message.reply_to_message != null) {
     whatUserSaid = message.reply_to_message!.text!;
   } else {
     message.reply(
