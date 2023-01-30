@@ -10,7 +10,8 @@ Future<TeleDart> getBot() async {
     throw StateError("=== Could not find BOT_TOKEN in ENV ===");
   }
 
-  final botName = (await Telegram(botToken!).getMe()).username;
+  final tele = Telegram(botToken!);
+  final botName = (await tele.getMe()).username;
   final teledart = TeleDart(
     botToken!,
     Event(botName!),
