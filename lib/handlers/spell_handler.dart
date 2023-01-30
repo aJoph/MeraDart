@@ -61,7 +61,8 @@ Future<void> handleSpell(TeleDartMessage? message, TeleDart bot) async {
   if (message == null || message.text == null) return;
   var whatUserSaid = getArguments(message.text ?? "");
 
-  var gifs = whatUserSaid.split('').map((e) => letterToGif[e] ?? "");
+  var gifs =
+      whatUserSaid.toLowerCase().split('').map((e) => letterToGif[e] ?? "");
   for (var gif in gifs) {
     if (gif.isEmpty) continue;
     await Future.delayed(const Duration(milliseconds: 500));
