@@ -17,16 +17,17 @@ Future<void> handleYt(TeleDartMessage? message) async {
     return;
   }
 
-  yt.Video? video;
+  yt.Video video;
   if (!cachedQueries.containsKey(query)) {
     await getVidTemporarily(query);
   }
-  video = cachedQueries[query]?.first;
 
-  if (video == null) {
-    message.reply("Não achei nada.");
+  if (cachedQueries[query] == null || cachedQueries[query]!.isEmpty) {
+    message.reply("Não achei nenhum video com essa pesquisa.");
     return;
   }
+
+  video = cachedQueries[query]!.first;
 
   final replyString = """(01/$maxYtResults)
 Da pesquisa:
@@ -57,25 +58,20 @@ Future<void> handleYtCallback(TeleDartCallbackQuery? m) async {
   if (nums == -1) return;
 
   if (m.data == "next") {
-    if (nums == maxYtResults) {
-      nums = 1;
-    } else {
-      nums++;
-    }
+    if (nums == maxYtResults) nums = 0;
+    nums++;
   } else if (m.data == "prev") {
-    if (nums == 1) {
-      nums = maxYtResults;
-    } else {
-      nums--;
-    }
+    nums = maxYtResults + 1;
+    nums--;
   } else {
     return;
   }
 
-  if (!cachedQueries.containsKey(lines[2])) {
-    await getVidTemporarily(lines[2]);
+  var query = lines[2];
+  if (!cachedQueries.containsKey(query)) {
+    await getVidTemporarily(query);
   }
-  final video = cachedQueries[lines[2]]?[nums];
+  final video = cachedQueries[query]?[nums];
   if (video == null) return;
 
   final replyString = """(${nums.toFormattedString()}/$maxYtResults)
