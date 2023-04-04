@@ -1,6 +1,0 @@
-services:
-  - type: web
-    name: mera-dart
-    env: docker
-    plan: free
-    buildCommand: docker build --build-arg BOT_TOKEN=$BOT_TOKEN .

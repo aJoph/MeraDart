@@ -42,6 +42,7 @@ por
       parse_mode: 'HTML', reply_markup: getYtInlineKeyboard(video.url));
 }
 
+/// Searches youtube for [query] and populates [cachedQueries] with the result tied to the query.
 Future<void> getVidTemporarily(String query) async {
   cachedQueries[query] = await _yt.search(query);
   Future.delayed(const Duration(minutes: 5))
@@ -50,31 +51,31 @@ Future<void> getVidTemporarily(String query) async {
 
 Future<void> handleYtCallback(TeleDartCallbackQuery? m) async {
   if (m == null) return;
-
-  final lines = m.message?.text?.split("\n");
+  final lines = m.message?.text?.split("\n"); // Getting each line so that we...
   if (lines == null) return;
 
-  var nums = int.tryParse(lines[0].substring(1, 3)) ?? -1;
+  var nums = int.tryParse(lines[0].substring(1, 3)) ??
+      -1; // Can get where we are in the list.
   if (nums == -1) return;
+  nums--; // list[0] would display as (01/20) for example
 
   if (m.data == "next") {
-    if (nums == maxYtResults) nums = 0;
+    if (nums == maxYtResults - 1) nums = -1; // wrap around.
     nums++;
   } else if (m.data == "prev") {
-    nums = maxYtResults + 1;
+    if (nums == 0) nums = maxYtResults; // wrap around.
     nums--;
   } else {
+    // If it's not next or prev, there's nothing to do.
     return;
   }
 
   var query = lines[2];
-  if (!cachedQueries.containsKey(query)) {
-    await getVidTemporarily(query);
-  }
+  if (!cachedQueries.containsKey(query)) await getVidTemporarily(query);
   final video = cachedQueries[query]?[nums];
   if (video == null) return;
 
-  final replyString = """(${nums.toFormattedString()}/$maxYtResults)
+  final replyString = """(${(nums + 1).toFormattedString()}/$maxYtResults)
 Da pesquisa:
 <i>${lines[2]}</i>
 Eu achei:
